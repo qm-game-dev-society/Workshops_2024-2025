@@ -1,0 +1,62 @@
+[gd_scene load_steps=7 format=3 uid="uid://df5c5264hyg6y"]
+
+[ext_resource type="Script" path="res://Scenes/pipe_set.gd" id="1_gvnuc"]
+[ext_resource type="Texture2D" uid="uid://dassh6refehl6" path="res://Assets/pipe.png" id="2_6iok6"]
+[ext_resource type="Texture2D" uid="uid://dkrayu36hthos" path="res://Assets/pipeMiddle.png" id="2_m2460"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ykp56"]
+size = Vector2(40, 694)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dpun0"]
+size = Vector2(34, 710)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wkh3d"]
+size = Vector2(20, 1606.5)
+
+[node name="PipeSet" type="Node2D"]
+scale = Vector2(2, 2)
+script = ExtResource("1_gvnuc")
+
+[node name="TopPipe" type="Area2D" parent="." groups=["Pipe"]]
+position = Vector2(-2, -52)
+
+[node name="PipeMiddle" type="Sprite2D" parent="TopPipe"]
+position = Vector2(0, -394.5)
+scale = Vector2(1, 20.3906)
+texture = ExtResource("2_m2460")
+
+[node name="PipeTop" type="Sprite2D" parent="TopPipe"]
+texture_repeat = 2
+position = Vector2(0, -36)
+texture = ExtResource("2_6iok6")
+flip_v = true
+region_rect = Rect2(0, 0, 40.356, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TopPipe"]
+position = Vector2(0, -343)
+shape = SubResource("RectangleShape2D_ykp56")
+
+[node name="BottomPipe" type="Area2D" parent="." groups=["Pipe"]]
+position = Vector2(0, 43)
+
+[node name="PipeTop" type="Sprite2D" parent="BottomPipe"]
+texture_repeat = 2
+position = Vector2(0, 43)
+texture = ExtResource("2_6iok6")
+region_rect = Rect2(0, 0, 40.356, 600)
+
+[node name="PipeMiddle" type="Sprite2D" parent="BottomPipe"]
+position = Vector2(0, 386.25)
+scale = Vector2(1, 20.3906)
+texture = ExtResource("2_m2460")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomPipe"]
+position = Vector2(0, 358)
+shape = SubResource("RectangleShape2D_dpun0")
+
+[node name="ScoreArea" type="Area2D" parent="." groups=["ScoreArea"]]
+position = Vector2(26, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ScoreArea"]
+position = Vector2(28, -0.75)
+shape = SubResource("RectangleShape2D_wkh3d")
