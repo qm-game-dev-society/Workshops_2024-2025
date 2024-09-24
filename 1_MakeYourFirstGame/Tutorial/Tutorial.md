@@ -24,6 +24,7 @@ And then renaming the node to "Game" for clarity sake it by right clicking on th
 ![](Tutorial_20240924112524006.png)
 
 You can then save the scene by either pressing ctrl-s (or the equvilant on your device) or by pressing the scene tab on the top left of the window and then selecting save scene from there.
+
 ![](Tutorial_20240924112934635.png)
 
 A window will then come up asking where you want to save the scene, for now just save it in the default location by just clicking save and nothing else.
@@ -42,8 +43,10 @@ Then go to the window section, listed under display and change the viewport widt
 And now your ready to run your (currently empty) game.
 
 Press the play button at the top right of the screen which will cause this notification window to come up, just click the "select current" button.
+
 ![](Tutorial_20240924183705505.png)
 ![](Tutorial_20240924183722555.png)
 
 And after a few seconds, a window running the currently empty project should appear on your screen at the set viewport width and height.
+
 ![](Tutorial_20240924183840881.png)
