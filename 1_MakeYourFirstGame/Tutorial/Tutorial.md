@@ -47,6 +47,8 @@ Next we're going to set the viewport width and height for the window our games g
 Then go to the window section, listed under display and change the viewport width to 450 and the viewport height to 720. And after that close the project settings window.
 ![](Tutorial_20240924182703000.png)
 
+Also go to the rendering: textures section and set default texture filter to nearest, without doing this all your sprites will look blurry.
+
 And now your ready to run your (currently empty) game.
 
 Press the play button at the top right of the screen which will cause this notification window to come up, just click the "select current" button.
@@ -58,3 +60,19 @@ Press the play button at the top right of the screen which will cause this notif
 And after a few seconds, a window running the currently empty project should appear on your screen at the set viewport width and height.
 
 ![](Tutorial_20240924183840881.png)
+
+
+# Making the player scene
+- Create a new scene by either pressing the add new scene (plus) button above the scene view or the new scene option under the scene tab on the top left
+- Add a Area2D node as the root node and rename it to player
+- Drag the bird image file into the scene view, creating a sprite2d node which displays that image
+- In the inspector, under the Transform tab, press the undo button next to the position property to centre the sprite in the scene
+- Add a CollisionShape2D node as a child to the player node and with that node selected in the inspector click on the shape property selector, click on the new RectangleShape2D and resize it to an appropriate size
+- Your screen should now look something like this
+![](Tutorial_20241007092534444.png)
+- Now finally save this scene the same way you saved the game scene, go back to the game scene tab, and drag the player scene from teh filesystem tab and drag it into the scene viewport to an appropriate position.
+![](Tutorial_20241007092821267.png)
+- If you want to you can scale up the player scene to a larger size to make it more visible using the scale property under the transform section under the node2d section in the inspector
+- And when you click the play button now you will actually have something on the screen.
+![](Tutorial_20241007093349993.png)
+- This is how most games in godot are structured, which allows for scenes such as enemies to be easily reusable.

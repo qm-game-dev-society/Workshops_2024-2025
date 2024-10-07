@@ -4,7 +4,7 @@
 [ext_resource type="AudioStream" uid="uid://84ejp1q7ssnm" path="res://Assets/score.wav" id="1_tnux3"]
 [ext_resource type="AudioStream" uid="uid://cm2irnujugm10" path="res://Assets/died.wav" id="2_xchbn"]
 [ext_resource type="AudioStream" uid="uid://dwtdtkxi7lqwt" path="res://Assets/jump.wav" id="3_5utue"]
-[ext_resource type="Texture2D" uid="uid://bwa0vkt7nknoe" path="res://Assets/bird1.png" id="5_pvv8j"]
+[ext_resource type="Texture2D" uid="uid://bwa0vkt7nknoe" path="res://Assets/bird.png" id="5_pvv8j"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8f6qk"]
 size = Vector2(23, 17)
@@ -27,5 +27,5 @@ stream = ExtResource("3_5utue")
 stream = ExtResource("1_tnux3")
 volume_db = -0.545
 
-[node name="Bird1" type="Sprite2D" parent="."]
+[node name="Bird" type="Sprite2D" parent="."]
 texture = ExtResource("5_pvv8j")
