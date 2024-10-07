@@ -76,3 +76,109 @@ And after a few seconds, a window running the currently empty project should app
 - And when you click the play button now you will actually have something on the screen.
 ![](Tutorial_20241007093349993.png)
 - This is how most games in godot are structured, which allows for scenes such as enemies to be easily reusable.
+
+# Making the player move
+- To get the player bird moving we're going to need to do some scripting
+- In godot any node can have a single script assigned to it at anytime, with the script being able to modify that nodes properties, eg a Node2Ds position
+- Go back to the player scene tab, select the Player node, right click and then press the option to attach script
+- A window will then pop up, but you don't need to change any of those settings for now, so just press the create button and the script you created with the default template will automatically pop up on your screen
+![](Tutorial_20241007094917660.png)
+
+- On this page there are 2 functions. Functions are a section of code that is ran everytime the function is called.
+- Both of these functions are built in to the engine, meaning that they are automatically called as the game runs
+- The _ready function is called when the node enters the scene tree for the first time, for the player this will be when the game starts and _process runs for every frame the node exists in the game, and the delta argument representing the amount of time since the last frame
+- For example this script would make the players position.y to increase 10 units per second, moving the player bird down
+
+```
+extends Area2D
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	position.y += 10 * delta
+```
+
+- This sort of looks like the player bird being pulled down by gravity, but something is missing, velocity and acceleration. this is because the downwards speed increases
+- So what we need is a velocity value which has its downwards velocity increase over time, so something like this
+```
+extends Area2D
+
+const GRAVITY : float = 10
+var velocity : float
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	velocity += GRAVITY * delta
+	position.y += velocity * delta
+```
+
+- So now the bird is now falling down in a way that looks more relistic, if you look at the top of the script there is a const (as in consistant, a value that can never be changed while the script is running) float (a decimal number) called GRAVITY and a variable (a value that can be changed during runtime) float called velocity which stores the current speed the player is moving up or down (depends on if the value is currently negative or positive)
+- Now lets allow the player to not only fall down but jump by pressing the space button, first navigate back to the project settings but this time, got to the top tab options on the new window and click on input map.
+![](Tutorial_20241007101727839.png)
+- Click on the add new action text box and enter the word jump and press the add button and it should now appear in the action table
+![](Tutorial_20241007101928709.png)
+- On that row, press the plus button, a new window will now pop up, as it is currently listing for the input you want to assign to the action just press the space button (or any button you want to assign to the jump action) then pressthe ok option and now you can see the space button assigned to the jump action.
+![](Tutorial_20241007102322759.png)
+- Now close that window and go back to the player script so we can use this input action to make the player jump
+```
+extends Area2D
+
+@export var GRAVITY : float = 10
+@export var JUMP_VELOCITY : float = -20 
+var velocity : float
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	if Input.is_action_just_pressed("jump"):
+		velocity = JUMP_VELOCITY
+	
+	velocity += GRAVITY * delta
+	
+	
+	position.y += velocity * delta
+
+```
+- Notice how gravity and jump_velocity are now variables and have @export written next to them? What @export does is make those values readable and editable from the inspector, so feel free to change those values to make jumping and falling feel good
+![](Tutorial_20241007104003840.png)
+- One last thing we should do is to make sure that the player doesnt go to far off screen, for now lets just limit the players y position to a certain range using the built in clamp function, we'll do with gameovers later.
+- We'll also not allow the player to jump if there to close the the 'ceiling'
+
+```
+extends Area2D
+
+@export var GRAVITY : float = 10
+@export var JUMP_VELOCITY : float = -20 
+var velocity : float
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	if Input.is_action_just_pressed("jump") and position.y > 3:
+		velocity = JUMP_VELOCITY
+	
+	velocity += GRAVITY * delta
+	
+	
+	position.y += velocity * delta
+	
+	position.y = clamp(position.y, 0, 800)
+
+```
