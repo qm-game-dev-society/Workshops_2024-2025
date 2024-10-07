@@ -182,3 +182,15 @@ func _process(delta: float) -> void:
 	position.y = clamp(position.y, 0, 800)
 
 ```
+
+# Making the pipe scene
+- Next, what we need is a scene containg the pipes that the player has to navigate through.
+- So first create a new scene with a Node2D node as its root and name it "PipeSet" and add two area2d nodes,naming them "topPipe" and "bottomPipe" as children
+- Drag in two pipe sprites into the scene viewport, add them as children trotate one of them upside down and position them with the middle gap being at the origin point of the scene 
+- Now add a collisionShape2d node as a child to each area2d node and assign its shape a new rectangleshape2d and size it approaprietly to the pipe sprite
+![](Tutorial_20241007112133142.png)
+- Now save this scene the same way you saved the player scene, go back to the game scene and place the pipe scene in an appropriate position to see how it looks (If you scaled up the player node in the game scene you might want to scale it up the pipes by the same value as well)
+![](Tutorial_20241007112514207.png)
+- Now go back to the PipeSet Scene and use the PipeMiddle image to make sure the pipe goes all the way to the top and bottom of the screen and change the collision shape size to reflect this.
+![](Tutorial_20241007112514207.png)
+![](Tutorial_20241007113124572.png)
