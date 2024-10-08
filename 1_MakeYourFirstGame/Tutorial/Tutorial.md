@@ -194,3 +194,158 @@ func _process(delta: float) -> void:
 - Now go back to the PipeSet Scene and use the PipeMiddle image to make sure the pipe goes all the way to the top and bottom of the screen and change the collision shape size to reflect this.
 ![](Tutorial_20241007112514207.png)
 ![](Tutorial_20241007113124572.png)
+
+# Making the Pipes move
+- The intuitive approach to you may be to have the player bird move forward as it passes by the pipes, but in this project the pipes will be moving towards the left of the screen. This gives the illusion that the player is moving when it actually isn't.
+- First go to the pipeSet Scene and attach a new script to the root node (PipeSet).
+- Then we're going to do something similar to what we did to simulate gravity with the player bird, but since we're going to be moving at a controlled speed at all times, theres no need for acceleration or velocity to be stored as variables, only the speed at which the pipe is moving.
+```
+extends Node2D
+
+var speed : float = -100
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	position.x += speed * delta
+```
+- Note that we are now manipulating position.x instead of position.y, as position.x represents the horizontal position of the node on screen, while position.y represents the vertical position.
+- Now we're going to put the speed variable in the root node of the game scene instead, so that the speed of multiple pipes can be changed at once
+- So go back to the main scene and attach a script to the game node and add a speed variable to that script
+```
+extends Node2D
+
+var speed : float = -100
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+```
+- And now instead of using the local speed variable in the pipeset script use the speed variable from its parents instead.
+```
+extends Node2D
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	position.x += get_parent().speed * delta
+```
+
+- If you click play now, you will see the pipe move across the screen, but nothing happens when you collide with it.
+
+# Implementing gameover
+- The game should end when either the player bird falls below the screen or if the player collides with one of the pipes.
+- When the game ends, the pipe speed should be set to 0 and so should stop moving.
+
+## Falling below the screen
+- Detecting if the player is below the screen, just check if position.y is equal to or larger than a certain value, but getting that info to the root game node.
+- For this we can use a feature of the godot game engine called signals
+- So first we're going to define the signal in the player scrpt and emit it if the position.y is below the screen
+```
+extends Area2D
+
+@export var GRAVITY : float = 10
+@export var JUMP_VELOCITY : float = -20 
+var velocity : float
+
+# define signal
+signal died()
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	if Input.is_action_just_pressed("jump") and position.y > 3:
+		velocity = JUMP_VELOCITY
+	
+	check_death()
+
+	
+	velocity += GRAVITY * delta
+	
+	
+	position.y += velocity * delta
+	
+	position.y = clamp(position.y, 0, 800)
+
+func check_death() -> void:
+	if position.y >= 730:
+		# emit signal
+		died.emit()
+```
+- Now if you go back to the game scene, select the player node in the scene hierarchy and then on the inspector panel click on the node tab
+![](Tutorial_20241008090016799.png)
+![](Tutorial_20241008090027833.png)
+- you will now notice in the signals, the one defined in the player script died is there. Now double click on it and this window will come up
+
+![](Tutorial_20241008090132913.png)
+
+- Click on the game node and click the connect button at the bottom of the screen and the game script will pop up with a new function created with a green symbol on the side, this function will be called whenever the player node emits the died signal.
+![](Tutorial_20241008090445935.png)
+- So all we need to do is when _on_player_died is called is to set the speed to zero and set a variable called gameover to true to keep track of this
+```
+extends Node2D
+
+var gameover : bool = false
+var speed : float = -100
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+
+func _on_player_died() -> void:
+	speed = 0
+	gameover = true
+```
+
+- if we go back to the player script we can now also get the gameover variable from the root game nodes script and only allow the player to jump and check for death in the _process function if the game is still running
+
+## Colliding with pipe
+- First we're going to go back to the pipe_set scene, select the TopPipe node and go to the groups tab, under the node tab from earlier.
+- Groups can be used to quickly identfy nodes, eg you could assign all enemies with an enemy group.
+- To add a group click the + symbol next the the filter groups text box.
+- Your going to create a group called "pipes", this will be a global group, so switch that option on, then click the ok button.
+- ![](Tutorial_20241008091959402.png)
+- Now you will notice that topPipe node now is assigned the pipes group
+![](Tutorial_20241008091829100.png)
+- now in the scene tree panel select the BottomPipe node and click the checkbox for the pipes group for that group as well.
+- Now you want to go back to the player scene and go back to the signals tab, you might of already noticed but the node also has alot of built in signals, you can hover your mouse over them and see what they do.
+- The signal we'll be using now is the area_entered signal, which detects when another area2d, eg one of the pipes collides with the player node.
+- Double click on the signal like before but this time select the Player node the same node your connecting from then press connect
+
+![](Tutorial_20241008092435185.png)
+
+- You may notice that the function that was created has an argument (a value given to the function when it is called), we can use this variable to figure out things about what was collided with, for example the group
+
+```
+func _on_area_entered(area: Area2D) -> void:
+	## area.is_in_group("pipes") returns trus if the node passed through is in the group
+	if area.is_in_group("pipes") == true and !get_parent().gameover == true:
+		died.emit()
+```
+- This code causes it so that whenever we collide with another area2d node with collision we check if it is in the group pipes and if it is and the game isn't already over it emits the died signal and does the same thing as if the player falls under the screen.
+- Now play the game and try out what we've made so far.
