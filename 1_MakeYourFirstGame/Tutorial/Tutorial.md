@@ -349,3 +349,223 @@ func _on_area_entered(area: Area2D) -> void:
 ```
 - This code causes it so that whenever we collide with another area2d node with collision we check if it is in the group pipes and if it is and the game isn't already over it emits the died signal and does the same thing as if the player falls under the screen.
 - Now play the game and try out what we've made so far.
+
+# Spawning more pipes
+- Now we've got a single pipe working, lets make the game spawn more pipes while playing the game so the player isn't left jumping in an empty void
+- So first we're going to place a node in the game scene to represent the position where we want the pipes to spawn, so create a node2d in the game scene, name it SpawnPoint and place it in an appropriate position
+![](Tutorial_20241008212100880.png)
+- Now go into the game node script and lets create a new function which will instantiate a new pipe and position it at the spawn point
+```
+extends Node2D
+
+# Assign pipe set scene in the node inspector
+@export var pipeScene : PackedScene
+
+var gameover : bool = false
+var speed : float = -100
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	# Spawn new pipe at spawn point when game starts running
+	spawn_pipe() 
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+
+func _on_player_died() -> void:
+	speed = 0
+	gameover = true
+
+func spawn_pipe() -> void:
+	# Create new instance of pipeScene
+	var newPipeSet : Node2D = pipeScene.instantiate()
+	newPipeSet.position = $SpawnPoint.position
+	# Changing scale to scale player and first pipe was scalled to
+	newPipeSet.apply_scale(Vector2(2,2))
+	add_child(newPipeSet)
+```
+- In the spawn_pipe function, a new instance of the pipeScene, which you need to assign in the inspector of the Game node), the position is set to the SpawnPoint nodes position ($SpawnPoint being short for get_node("SpawnPoint)) and added to the scene as a child of the game node (like the player)
+- Now go to the inspector of the Game node and assign the Pipe Scene varialble the pipe_set scene file from the FileSystem which you created earlier
+![](Tutorial_20241008213807363.png)
+- Now when you click play a pipe should of spawned off screen and should move on screen in a couple of seconds after the game starts.
+- Now we're going to make the game keep spawning pipeSets until the player dies, this can be done by adding a new variable and some lines in the process function
+```
+extends Node2D
+
+# Asign pipe set scene in the node inspector
+@export var pipeScene : PackedScene
+
+var gameover : bool = false
+var speed : float = -100
+
+@export var time_between_pipes : float = 3
+var time_since_last_pipe : float = 0
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	spawn_pipe() 
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	if gameover == false:
+		# adds time since last frame to total time since last pipe
+		time_since_last_pipe += delta
+		
+		# spawns pipe and reset timer if time_since_last_pipe exceeds time_between_pipes
+		if time_since_last_pipe > time_between_pipes:
+			spawn_pipe()
+			time_since_last_pipe = 0
+			
+
+
+func _on_player_died() -> void:
+	speed = 0
+	gameover = true
+
+func spawn_pipe() -> void:
+	# Create new instance of pipeScene
+	var newPipeSet : Node2D = pipeScene.instantiate()
+	newPipeSet.position = $SpawnPoint.position
+	# Changing scale to scale player and first pipe was scalled to
+	newPipeSet.apply_scale(Vector2(2,2))
+	add_child(newPipeSet)
+
+```
+- Now the game will endlessly spawn pipes until the player dies.
+- But all the pipes being at the same height seems very boring, we can use random numbers generation to vary the y position of each pipe
+
+```
+extends Node2D
+
+# Asign pipe set scene in the node inspector
+@export var pipeScene : PackedScene
+
+var gameover : bool = false
+var speed : float = -100
+
+@export var time_between_pipes : float = 3
+var time_since_last_pipe : float = 0
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	spawn_pipe() 
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	# adds time since last frame to total time since last pipe
+	time_since_last_pipe += delta
+	
+	# spawns pipe and reset timer if time_since_last_pipe exceeds time_between_pipes
+	if time_since_last_pipe > time_between_pipes:
+		spawn_pipe()
+		time_since_last_pipe = 0
+		
+
+
+func _on_player_died() -> void:
+	speed = 0
+	gameover = true
+
+func spawn_pipe() -> void:
+	# Create new instance of pipeScene
+	var newPipeSet : Node2D = pipeScene.instantiate()
+	newPipeSet.position = $SpawnPoint.position
+	# Changing scale to scale player and first pipe was scalled to
+	newPipeSet.apply_scale(Vector2(2,2))
+	add_child(newPipeSet)
+```
+
+# Scoring system
+- The final thing we're going to do is have a score display that increases by 1 whenever the player passes through a pipe.
+- So first lets get an on screen score counter, go to the game scenes 2D view and add a control node and a label node as a child of that node and name it "ScoreLabel"
+![](Tutorial_20241008220028710.png)
+- Now enter an example score (eg 10) into the text box in the inspector
+![](Tutorial_20241008220223759.png)
+- then go to Control - Theme Overrides - Font Sizes and increase it to a suitable size.
+- Then position the text labele to a approatire position, eg top centre of the screen.
+![](Tutorial_20241008220356989.png)
+- Now lets implement an actual scoring system into the game
+- What we're going to do is similar to detecting when the player collides with a pipe but instead have an invisible collisio area at the end of a pipe gap to trigger the player to send a signal and increase the score by 1.
+- So go to the pipe_set scene, add a new area2d node and call it "ScoreZone", then add a CollisionShape2d as child and create a shape just like you did for the pipes just after the pipe gap, finally assign the ScoreZone node to a group named "score", making sure its global.
+![](Tutorial_20241008222136955.png)
+- Now lets go back to the player node and emit a custom signal called score whenever we collide with an object of this group
+```
+extends Area2D
+
+@export var GRAVITY : float = 10
+@export var JUMP_VELOCITY : float = -20 
+var velocity : float
+
+# define signal
+signal died()
+signal scored()
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	if not get_parent().gameover == true:
+		if Input.is_action_just_pressed("jump") and position.y > 3:
+			velocity = JUMP_VELOCITY
+		
+		check_death()
+	
+	velocity += GRAVITY * delta
+	position.y += velocity * delta
+	
+	position.y = clamp(position.y, 0, 800)
+
+func check_death() -> void:
+	if position.y >= 730:
+		# emit signal
+		died.emit()
+
+
+func _on_area_entered(area: Area2D) -> void:
+	## area.is_in_group("pipes") returns trus if the node passed through is in the group
+	if area.is_in_group("pipes") == true and !get_parent().gameover == true:
+		died.emit()
+	if area.is_in_group("score") == true:
+		scored.emit()
+```
+- Now you can go to the game scene and connect the player socred signal to the game node script and have that increase the score variable by 1 every time its hit
+
+```
+func _on_player_scored() -> void:
+	score += 1
+```
+
+- And then finally have the game node script update the ScoreLabels text to the current score every frame in the process function
+
+```
+func _process(delta: float) -> void:
+	if gameover == false:
+		# adds time since last frame to total time since last pipe
+		time_since_last_pipe += delta
+		
+		# spawns pipe and reset timer if time_since_last_pipe exceeds time_between_pipes
+		if time_since_last_pipe > time_between_pipes:
+			spawn_pipe()
+			time_since_last_pipe = 0
+		
+		# str(score) converts the score integer into a string so it can be used as the label text
+		$Control/ScoreLabel.text = str(score)
+
+```
+
+
+- After all that you now have a complete basic game
+
+# Extras
+- If you want to change the layering of the player and the pipe, either change the order in the scene hierarchy or mess around with CanvasItem - Ordering - z Index for the root node of theplayer and pipe scene
+- If you want to add a background, you can use a colour rect node, have it cover the entire screen with and place it behind the player and pipes, (set z-index to -1)
+
+# Possible improvements
+- Add animations
+- Add collectable coins to allow the player to get extra points
+- increase the speed of pipe travel over time
+- Add sound effects
