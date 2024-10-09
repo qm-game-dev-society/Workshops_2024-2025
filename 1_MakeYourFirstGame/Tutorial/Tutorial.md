@@ -1,8 +1,17 @@
-# Setting up your project
+
+# Making your first game
+
+Download this before starting!
+zip file containing assets required: [link](https://drive.google.com/file/d/1IOSKGbzDsuDvqvXZx76mMlki5uvtw1Ln/view?usp=sharing)
+
+
+## Setting up your project
 
 First download the Godot engine from the official website via this [link](https://godotengine.org/download) and run it on your device.
 
-After doing thatyou should see a screen like this:
+Alternativly you could use the [web editor](https://editor.godotengine.org/releases/4.3.stable/godot.editor.html) instead, but I wouldn't recommend it if you can do the first option
+
+After doing that you should see a screen like this:
 
 ![](./godotEngineStartScreen.png)
 
@@ -183,7 +192,7 @@ func _process(delta: float) -> void:
 
 ```
 
-# Making the pipe scene
+## Making the pipe scene
 - Next, what we need is a scene containg the pipes that the player has to navigate through.
 - So first create a new scene with a Node2D node as its root and name it "PipeSet" and add two area2d nodes,naming them "topPipe" and "bottomPipe" as children
 - Drag in two pipe sprites into the scene viewport, add them as children trotate one of them upside down and position them with the middle gap being at the origin point of the scene 
@@ -247,11 +256,11 @@ func _process(delta: float) -> void:
 
 - If you click play now, you will see the pipe move across the screen, but nothing happens when you collide with it.
 
-# Implementing gameover
+## Implementing gameover
 - The game should end when either the player bird falls below the screen or if the player collides with one of the pipes.
 - When the game ends, the pipe speed should be set to 0 and so should stop moving.
 
-## Falling below the screen
+### Falling below the screen
 - Detecting if the player is below the screen, just check if position.y is equal to or larger than a certain value, but getting that info to the root game node.
 - For this we can use a feature of the godot game engine called signals
 - So first we're going to define the signal in the player scrpt and emit it if the position.y is below the screen
@@ -324,7 +333,7 @@ func _on_player_died() -> void:
 
 - if we go back to the player script we can now also get the gameover variable from the root game nodes script and only allow the player to jump and check for death in the _process function if the game is still running
 
-## Colliding with pipe
+### Colliding with pipe
 - First we're going to go back to the pipe_set scene, select the TopPipe node and go to the groups tab, under the node tab from earlier.
 - Groups can be used to quickly identfy nodes, eg you could assign all enemies with an enemy group.
 - To add a group click the + symbol next the the filter groups text box.
@@ -350,7 +359,7 @@ func _on_area_entered(area: Area2D) -> void:
 - This code causes it so that whenever we collide with another area2d node with collision we check if it is in the group pipes and if it is and the game isn't already over it emits the died signal and does the same thing as if the player falls under the screen.
 - Now play the game and try out what we've made so far.
 
-# Spawning more pipes
+## Spawning more pipes
 - Now we've got a single pipe working, lets make the game spawn more pipes while playing the game so the player isn't left jumping in an empty void
 - So first we're going to place a node in the game scene to represent the position where we want the pipes to spawn, so create a node2d in the game scene, name it SpawnPoint and place it in an appropriate position
 ![](Tutorial_20241008212100880.png)
@@ -475,7 +484,7 @@ func spawn_pipe() -> void:
 	add_child(newPipeSet)
 ```
 
-# Scoring system
+## Scoring system
 - The final thing we're going to do is have a score display that increases by 1 whenever the player passes through a pipe.
 - So first lets get an on screen score counter, go to the game scenes 2D view and add a control node and a label node as a child of that node and name it "ScoreLabel"
 ![](Tutorial_20241008220028710.png)
@@ -560,11 +569,11 @@ func _process(delta: float) -> void:
 
 - After all that you now have a complete basic game
 
-# Extras
+## Extras
 - If you want to change the layering of the player and the pipe, either change the order in the scene hierarchy or mess around with CanvasItem - Ordering - z Index for the root node of theplayer and pipe scene
 - If you want to add a background, you can use a colour rect node, have it cover the entire screen with and place it behind the player and pipes, (set z-index to -1)
 
-# Possible improvements
+## Possible improvements
 - Add animations
 - Add collectable coins to allow the player to get extra points
 - increase the speed of pipe travel over time
