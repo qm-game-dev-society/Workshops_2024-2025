@@ -479,6 +479,8 @@ func spawn_pipe() -> void:
 	# Create new instance of pipeScene
 	var newPipeSet : Node2D = pipeScene.instantiate()
 	newPipeSet.position = $SpawnPoint.position
+	# Randomise newPipeSet y (vertical) position
+	newPipeSet.position.y += randf_range(150,-150)
 	# Changing scale to scale player and first pipe was scalled to
 	newPipeSet.apply_scale(Vector2(2,2))
 	add_child(newPipeSet)
