@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://xlacqmyo4whp"]
+
+[ext_resource type="Texture2D" uid="uid://bwgyc0ww1ilhk" path="res://icon.svg" id="1_7kvko"]
+[ext_resource type="Script" path="res://Scenes/Enemies/enemy.gd" id="1_wwpox"]
+[ext_resource type="Script" path="res://Scenes/Health.gd" id="3_457w3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_t6gud"]
+size = Vector2(64, 67)
+
+[node name="Enemy" type="Area2D"]
+script = ExtResource("1_wwpox")
+SPEED = 100.0
+
+[node name="Icon" type="Sprite2D" parent="."]
+self_modulate = Color(0.998713, 0.373003, 0.36288, 1)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_7kvko")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0.5)
+shape = SubResource("RectangleShape2D_t6gud")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("3_457w3")
+
+[connection signal="died" from="Health" to="." method="_on_health_died"]
