@@ -1,13 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://c2oc46ujt6usw"]
+[gd_scene load_steps=5 format=3 uid="uid://c2oc46ujt6usw"]
 
 [ext_resource type="Script" path="res://Scenes/player.gd" id="1_b0ehw"]
 [ext_resource type="Texture2D" uid="uid://bwgyc0ww1ilhk" path="res://icon.svg" id="2_22ogd"]
+[ext_resource type="PackedScene" uid="uid://d21iltokk2evo" path="res://Scenes/bullet.tscn" id="2_jtu50"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ypkvp"]
 size = Vector2(131, 134)
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_b0ehw")
+bulletScene = ExtResource("2_jtu50")
 
 [node name="Icon" type="Sprite2D" parent="."]
 texture = ExtResource("2_22ogd")
